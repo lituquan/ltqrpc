@@ -4,13 +4,19 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class ServiceContainer {
-	private static final Map<String, Class<?>> serviceRegistry = new ConcurrentHashMap<String, Class<?>>();
+	private static final Map<String,Object> serviceRegistry = new ConcurrentHashMap();
 
     public static void register(Class serviceInterface, Class impl) {
-        serviceRegistry.put(serviceInterface.getName(), impl);
+        try {
+            serviceRegistry.put(serviceInterface.getName(), impl.newInstance());
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
     }
-    public static Class get(String serviceName){
-    	  Class serviceClass = serviceRegistry.get(serviceName);
+    public static Object get(String serviceName){
+    	  Object serviceClass = serviceRegistry.get(serviceName);
     	  return serviceClass;
     }
 }

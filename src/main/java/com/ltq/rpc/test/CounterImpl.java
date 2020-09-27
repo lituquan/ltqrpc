@@ -32,5 +32,11 @@ public class CounterImpl implements Counter {
 	public int count() {		
 		return atomic.addAndGet(1);
 	}
-	
+
+	public static void main(String[] args) {
+		CounterImpl counter = new CounterImpl();
+		for (int i = 0; i < 100; i++) {
+			System.out.println(counter.count());
+		}
+	}
 }

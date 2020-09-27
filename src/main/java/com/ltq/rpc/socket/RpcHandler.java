@@ -45,28 +45,12 @@ public class RpcHandler implements Runnable {
         Class<?>[] parameterTypes = (Class<?>[]) req.getTypeParameters();
         Object[] arguments = (Object[]) req.getParameters();              
         //代理方法
-        Class serviceClass = ServiceContainer.get(serviceName);
+        Object serviceClass = ServiceContainer.get(serviceName);
         if (serviceClass == null) {
             throw new ClassNotFoundException(serviceName + " not found");
         }
-        Method method = serviceClass.getMethod(methodName, parameterTypes);
-        Object result = method.invoke(serviceClass.newInstance(), arguments);   
+        Method method = serviceClass.getClass().getMethod(methodName, parameterTypes);
+        Object result = method.invoke(serviceClass, arguments);
         return result;
-    }
-}
-
-class ServiceInvocation  implements InvocationHandler {
-
-    private Object target;
-
-    public ServiceInvocation(Object target) {
-        this.target = target;
-    }
-
-    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-        System.out.println("判断用户是否有权限进行操作");
-        Object obj = method.invoke(target);
-        System.out.println("记录用户执行操作的用户信息、更改内容和时间等");
-        return obj;
     }
 }

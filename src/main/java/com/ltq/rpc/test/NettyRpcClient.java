@@ -16,19 +16,22 @@ import com.ltq.rpc.register.zookeeper.ZooKeeperServiceDiscovery;
 * 服务限流
 */
 public class NettyRpcClient {
-	public static void main(String[] args) {
+	public static void main(String[] args) throws InterruptedException {
 		//连接注册中心
 		String zkAddress="127.0.0.1:2181";
 		ServiceRegistry serviceRegistry0=new ZooKeeperServiceDiscovery(zkAddress);
-		//服务发现：假设当前只有一个服务地址  ip：port
-		//这里可以做客户端负载均衡
-		String discover = serviceRegistry0.discover(Hello.class.getName());
-		
 		//服务代理对象
-		NettyClientProxy proxy=new NettyClientProxy(discover);
+		NettyClientProxy proxy=new NettyClientProxy(serviceRegistry0);
 		Hello clientIntance = (Hello) proxy.getClientIntance(Hello.class);
-				
+
+		Counter counter= (Counter) proxy.getClientIntance(Counter.class);
 		//服务调用
 		System.out.println(clientIntance.add(100, 50));
+		System.out.println(clientIntance.add(100, 50));
+		System.out.println(clientIntance.add(100, 50));
+
+		for (int i = 0; i < 100; i++) {
+			System.out.println(counter.count());
+		}
 	}
 }

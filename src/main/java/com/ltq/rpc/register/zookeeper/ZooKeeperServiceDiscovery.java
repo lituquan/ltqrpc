@@ -6,6 +6,7 @@ import java.util.concurrent.ThreadLocalRandom;
 
 import org.I0Itec.zkclient.ZkClient;
 import org.I0Itec.zkclient.serialize.BytesPushThroughSerializer;
+import org.apache.zookeeper.ClientCnxn;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -86,6 +87,7 @@ public class ZooKeeperServiceDiscovery implements ServiceRegistry{
             zkClient.createPersistent(servicePath);
             LOGGER.debug("create service node: {}", servicePath);
         }
+        ClientCnxn x;
         // 创建 address 节点（临时）
         String addressPath = servicePath + "/address-";
         String addressNode = zkClient.createEphemeralSequential(addressPath, serviceAddress.getBytes());

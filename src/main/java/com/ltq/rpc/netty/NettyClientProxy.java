@@ -6,27 +6,16 @@ import java.lang.reflect.Proxy;
 import java.util.UUID;
 
 import com.ltq.rpc.code.Request;
+import com.ltq.rpc.code.Response;
+import com.ltq.rpc.register.ServiceRegistry;
+import com.ltq.rpc.socket.RpcFuture;
 
 
 public class NettyClientProxy<T> implements InvocationHandler {
     private RpcClientHandler ch;
-  
-    public NettyClientProxy(String ip, int port) {
-        try {
-            this.ch = new RpcClientHandler(ip, port);
-        } catch (Exception e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-    }
-    public NettyClientProxy(String addr) {
-        try {
-        	String[] partString=addr.split(":");
-            this.ch = new RpcClientHandler(partString[0], Integer.valueOf(partString[1]));
-        } catch (Exception e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+
+    public NettyClientProxy(ServiceRegistry registry) {
+        this.ch = new RpcClientHandler(registry);
     }
     
 	//反射的原理：生成继承proxy的子类字节码,传递一个InvocationHandler对象
@@ -43,8 +32,8 @@ public class NettyClientProxy<T> implements InvocationHandler {
         req.setMethodName(method.getName());
         req.setParameters(args);
         req.setTypeParameters(method.getParameterTypes());
-            
-        return  ch.send(req);
+        RpcFuture future = ch.send(req);
+        return  future.get();
     }
 
 }
